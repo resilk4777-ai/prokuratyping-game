@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>プロクラ ローマじ タイピング</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Hiragino Sans","Yu Gothic",sans-serif; background: linear-gradient(180deg,#67e8f9 0%,#93c5fd 45%,#dbeafe 100%); }
+    .app { width:100vw; height:100vh; padding:12px; }
+    .wrap { max-width:1200px; margin:0 auto; height:100%; display:flex; flex-direction:column; gap:12px; }
+    .card { background: rgba(255,255,255,.92); border:4px solid #38bdf8; border-radius:28px; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    .top { padding:16px; }
+    .row { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .title { font-size:34px; font-weight:900; color:#0369a1; }
+    .sub { margin-top:4px; font-size:16px; font-weight:700; color:#334155; }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; min-width:420px; }
+    .stat { border-radius:18px; padding:10px 12px; text-align:center; }
+    .s1{background:#e0f2fe}.s2{background:#fef3c7}.s3{background:#dcfce7}.s4{background:#ffe4e6}
+    .stat .label{font-size:11px;font-weight:700;color:#64748b}
+    .stat .num{font-size:34px;font-weight:900}
+    .bar{margin-top:12px;height:16px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    .fill{height:100%;background:#d946ef;width:100%;transition:width .3s}
+    .main { flex:1; min-height:0; }
+    .center { height:100%; display:flex; align-items:center; justify-content:center; }
+    .startgrid { width:100%; max-width:1000px; display:grid; grid-template-columns:1.15fr .85fr; gap:16px; }
+    .start, .side { padding:24px; background:#fff; border-radius:32px; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    .start { border:4px solid #7dd3fc; text-align:center; }
+    .emoji { font-size:64px; }
+    .start h1 { margin:12px 0 0; font-size:48px; line-height:1.2; color:#0284c7; }
+    .start p { font-size:22px; font-weight:700; color:#334155; line-height:1.5; }
+    .notes { margin-top:20px; background:#fef3c7; border-radius:24px; padding:16px; text-align:left; font-weight:800; color:#334155; font-size:19px; }
+    .goal { margin:0 0 8px; padding:10px 14px; border-radius:18px; background:#dcfce7; color:#047857; font-size:18px; }
+    .note2 { margin:0 0 8px; padding:10px 14px; border-radius:18px; background:#fff; font-size:17px; }
+    .btn { border:none; border-radius:24px; cursor:pointer; font-weight:900; }
+    .startbtn { margin-top:24px; background:#0ea5e9; color:#fff; font-size:38px; padding:18px 40px; }
+    .small { margin-top:10px; font-size:14px; color:#64748b; font-weight:700; }
+    .side { border:4px solid #86efac; display:flex; flex-direction:column; justify-content:center; }
+    .previewgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .previewbox,.imgbox { border:4px solid #e2e8f0; border-radius:24px; padding:12px; background:#f8fafc; height:150px; display:flex; align-items:center; justify-content:center; }
+    .sidecap { margin-top:16px; border-radius:24px; background:#ecfdf5; padding:16px; text-align:center; }
+    .sidecap .big{font-size:28px;font-weight:900;color:#10b981}
+    .sidecap .sm{margin-top:8px;font-size:17px;font-weight:800;color:#475569}
+    .playcol{height:100%; display:grid; grid-template-rows:1fr auto; gap:12px;}
+    .playcard { padding:16px; background:#fff; border-radius:28px; border:4px solid #cbd5e1; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    .playgrid { height:100%; display:grid; grid-template-columns:210px 1fr; gap:16px; align-items:center; }
+    .label2 { font-size:18px; font-weight:900; color:#64748b; }
+    .jp { margin-top:8px; font-size:56px; line-height:1.2; font-weight:900; color:#1e293b; }
+    .typed { margin-top:16px; background:#f1f5f9; border-radius:24px; padding:14px 16px; font-size:42px; font-weight:900; letter-spacing:.15em; word-break:break-all; }
+    .good { color:#059669; } .rest { color:#94a3b8; }
+    .example { margin-top:8px; font-size:24px; color:#475569; font-weight:800; }
+    .kbd { background:rgba(255,255,255,.96); border:4px solid #cbd5e1; border-radius:22px; padding:12px; box-shadow:0 12px 30px rgba(0,0,0,.12); }
+    .kbdtxt { text-align:center; font-size:18px; color:#334155; font-weight:800; margin-bottom:8px; }
+    .keys { display:flex; flex-direction:column; gap:8px; }
+    .keyrow { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+    .key { width:44px; height:44px; border-radius:14px; border:2px solid #cbd5e1; background:#f8fafc; font-size:22px; font-weight:900; cursor:pointer; }
+    .key.next { background:#fcd34d; border-color:#f59e0b; color:#0f172a; }
+    .nexttxt { margin-top:10px; text-align:center; font-size:15px; color:#475569; font-weight:800; }
+    .nextbadge{display:inline-block;background:#fde68a;padding:6px 10px;border-radius:12px;font-size:24px;color:#0f172a}
+    .resultwrap { max-width:980px; margin:0 auto; }
+    .result { padding:24px; background:#fff; border-radius:32px; border:4px solid #86efac; box-shadow:0 12px 30px rgba(0,0,0,.12); text-align:center; }
+    .result.goal { border-color:#fde047; background:linear-gradient(180deg,#fff7cc 0%,#ffffff 55%,#ecfeff 100%); }
+    .msg { font-size:42px; font-weight:900; color:#10b981; }
+    .goal .msg { color:#f59e0b; }
+    .scorelab { margin-top:16px; font-size:24px; font-weight:800; color:#475569; }
+    .scorebig { font-size:88px; font-weight:900; color:#0284c7; }
+    .grid4 { margin-top:16px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .info { background:#f1f5f9; border-radius:20px; padding:12px; text-align:center; }
+    .info .l{font-size:12px;font-weight:800;color:#64748b}.info .n{font-size:42px;font-weight:900}
+    .rank { margin-top:24px; background:rgba(255,255,255,.95); border:4px solid #bae6fd; border-radius:28px; padding:20px; }
+    .rank h2 { margin:0; font-size:42px; color:#0369a1; font-weight:900; }
+    .rankrow { margin-top:16px; display:flex; gap:16px; }
+    .namein { flex:1; height:70px; border-radius:22px; border:3px solid #0ea5e9; padding:0 20px; font-size:34px; font-weight:900; }
+    .regbtn, .loadbtn { height:70px; padding:0 24px; font-size:28px; }
+    .regbtn { background:#facc15; color:#0f172a; }
+    .regbtn[disabled], .loadbtn[disabled] { background:#cbd5e1; color:#94a3b8; cursor:default; }
+    .loadbtn { background:#0ea5e9; color:#fff; }
+    .rmsg { margin-top:16px; padding:16px; border-radius:18px; background:#e0f2fe; color:#0369a1; font-size:20px; font-weight:800; }
+    .list { margin-top:16px; display:flex; flex-direction:column; gap:10px; }
+    .item { display:flex; align-items:center; gap:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:18px; padding:14px 16px; }
+    .ranknum { width:46px; height:46px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; }
+    .gold{background:#fde047}.silver{background:#cbd5e1}.bronze{background:#fdba74}.normal{background:#dbeafe;color:#0369a1}
+    .nm { flex:1; font-size:30px; font-weight:900; color:#0f172a; }
+    .sc { font-size:40px; font-weight:900; color:#0284c7; }
+    @media (max-width: 900px) {
+      .startgrid, .playgrid, .rankrow, .row { grid-template-columns:1fr; display:block; }
+      .stats { min-width:0; margin-top:12px; }
+      .grid4 { grid-template-columns:repeat(2,1fr); }
+      .playcard { height:auto; }
+      .jp { font-size:40px; }
+      .typed { font-size:30px; }
+      .title{font-size:26px}
+      .scorebig{font-size:64px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="wrap">
+    <div class="card top">
+      <div class="row">
+        <div>
+          <div class="title">プロクラ ローマじ タイピング</div>
+          <div class="sub">60びょうで たくさん うとう！ したに キーボードつき！</div>
+        </div>
+        <div class="stats">
+          <div class="stat s1"><div class="label">のこり</div><div class="num" id="timeNum">60</div></div>
+          <div class="stat s2"><div class="label">スコア</div><div class="num" id="scoreNum">0</div></div>
+          <div class="stat s3"><div class="label">ことば</div><div class="num" id="wordNum">0</div></div>
+          <div class="stat s4"><div class="label">ミス</div><div class="num" id="missNum">0</div></div>
+        </div>
+      </div>
+      <div class="bar"><div class="fill" id="timeFill"></div></div>
+    </div>
+    <div class="main" id="main"></div>
+  </div>
+</div>
+
+<script>
+const WORDS = [
+  { jp: "つるはし", romaji: ["turuhasi","tsuruhashi"], image: "pickaxe" },
+  { jp: "けん", romaji: ["ken"], image: "sword" },
+  { jp: "ダイヤのけん", romaji: ["daiyanoken"], image: "diamond_sword" },
+  { jp: "ダイヤ", romaji: ["daiya"], image: "diamond" },
+  { jp: "きん", romaji: ["kin"], image: "gold_ingot" },
+  { jp: "てつ", romaji: ["tetu","tetsu"], image: "iron_ingot" },
+  { jp: "せきたん", romaji: ["sekitan"], image: "coal" },
+  { jp: "たいまつ", romaji: ["taimatu","taimatsu"], image: "torch" },
+  { jp: "りんご", romaji: ["ringo"], image: "apple" },
+  { jp: "パン", romaji: ["pan"], image: "bread" },
+  { jp: "ベッド", romaji: ["beddo"], image: "bed" },
+  { jp: "チェスト", romaji: ["chesuto"], image: "chest" },
+  { jp: "ドア", romaji: ["doa"], image: "door" },
+  { jp: "おの", romaji: ["ono"], image: "axe" },
+  { jp: "シャベル", romaji: ["syaberu","shaberu"], image: "shovel" },
+  { jp: "ぼうし", romaji: ["bousi","boushi"], image: "helmet" },
+  { jp: "よろい", romaji: ["yoroi"], image: "chestplate" },
+  { jp: "ブーツ", romaji: ["buutsu"], image: "boots" },
+  { jp: "たて", romaji: ["tate"], image: "shield" },
+  { jp: "ボート", romaji: ["booto"], image: "boat" },
+  { jp: "うま", romaji: ["uma"], image: "horse" },
+  { jp: "ひつじ", romaji: ["hituzi","hitsuji"], image: "sheep" },
+  { jp: "ぶた", romaji: ["buta"], image: "pig" },
+  { jp: "にわとり", romaji: ["niwatori"], image: "chicken" },
+  { jp: "クリーパー", romaji: ["kuri-pa-"], image: "creeper" },
+  { jp: "ゾンビ", romaji: ["zonbi"], image: "zombie" },
+  { jp: "スケルトン", romaji: ["sukeruton"], image: "skeleton" },
+  { jp: "オオカミ", romaji: ["ookami"], image: "wolf" },
+  { jp: "いし", romaji: ["isi","ishi"], image: "stone" },
+  { jp: "き", romaji: ["ki"], image: "log" },
+];
+const KEY_ROWS = [["q","w","e","r","t","y","u","i","o","p","-"],["a","s","d","f","g","h","j","k","l"],["z","x","c","v","b","n","m"]];
+const TOTAL_TIME = 60;
+const POINT_PER_CHAR = 10;
+const POINT_PER_WORD = 20;
+const POINT_PER_STREAK = 2;
+const MISS_PENALTY = 8;
+const MAX_RANKING = 10;
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCpsV01ktW2cNlgCtCMqNcbiLJ1ZlSGc5yOM5ESdJjA3yBPcRlFdFmqBOwzE_hjKHb/exec";
+const LOCAL_KEY = "progra-typing-local-ranking-v2";
+
+const state = {
+  started: false, timeLeft: TOTAL_TIME, score: 0, correctWords: 0, totalTyped: 0, missCount: 0, streak: 0, maxStreak: 0,
+  wordPool: shuffle(WORDS), index: 0, activeStates: [], ranking: loadLocalRanking(), currentName: "", hasRegistered: false,
+  rankingLoading: false, rankingMessage: "この端末のランキングを表示中。共通ランキングは下のボタンで読み込みます。"
+};
+
+function shuffle(array){ const a=[...array]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+function loadLocalRanking(){ try{ const raw=localStorage.getItem(LOCAL_KEY); return raw?JSON.parse(raw):[]; }catch{ return []; } }
+function saveLocalRanking(items){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(items)); }catch{} }
+function currentWord(){ return state.wordPool[state.index % state.wordPool.length]; }
+function resetActive(){ state.activeStates=[{ option: currentWord().romaji[0], pos:0 }]; }
+resetActive();
+
+function svgDataUri(svg){ return "data:image/svg+xml;utf8," + encodeURIComponent(svg); }
+const IMAGES = {
+  pickaxe: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="48" y="44" width="12" height="52" fill="#7c4a1f"/><rect x="22" y="24" width="48" height="12" fill="#46c6da"/><rect x="10" y="36" width="18" height="12" fill="#46c6da"/><rect x="64" y="36" width="20" height="12" fill="#46c6da"/></svg>'),
+  sword: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="54" y="16" width="20" height="52" fill="#d6dde6"/><rect x="42" y="54" width="44" height="12" fill="#8b5e34"/><rect x="58" y="66" width="12" height="30" fill="#5f3b20"/></svg>'),
+  diamond_sword: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="54" y="14" width="20" height="54" fill="#32d5ea"/><rect x="42" y="54" width="44" height="12" fill="#2563eb"/><rect x="58" y="66" width="12" height="30" fill="#5f3b20"/></svg>'),
+  diamond: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><polygon points="64,18 96,50 64,100 32,50" fill="#32d5ea"/></svg>'),
+  gold_ingot: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="26" y="48" width="76" height="24" rx="4" fill="#facc15"/></svg>'),
+  iron_ingot: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="26" y="48" width="76" height="24" rx="4" fill="#cbd5e1"/></svg>'),
+  coal: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><polygon points="64,24 96,42 84,88 42,96 24,54" fill="#1f2937"/></svg>'),
+  torch: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="58" y="40" width="12" height="48" fill="#7c4a1f"/><polygon points="64,18 82,42 46,42" fill="#fb923c"/></svg>'),
+  apple: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><circle cx="62" cy="66" r="28" fill="#ef4444"/></svg>'),
+  bread: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="24" y="42" width="80" height="42" rx="18" fill="#c97a21"/></svg>'),
+  bed: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="24" y="46" width="80" height="26" fill="#ef4444"/><rect x="24" y="36" width="24" height="16" fill="#ffffff"/></svg>'),
+  chest: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="28" y="34" width="72" height="56" fill="#a16207"/><rect x="28" y="58" width="72" height="10" fill="#7c4a1f"/></svg>'),
+  door: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="38" y="18" width="52" height="88" fill="#a16207"/></svg>'),
+  axe: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="56" y="30" width="12" height="56" fill="#7c4a1f"/><path d="M44 28h34v26H56c-9 0-16-7-16-16z" fill="#cbd5e1"/></svg>'),
+  shovel: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="58" y="22" width="12" height="46" fill="#7c4a1f"/><path d="M50 68q14-18 28 0v22H50z" fill="#cbd5e1"/></svg>'),
+  helmet: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><path d="M28 58c6-22 24-34 36-34s30 12 36 34v18H28z" fill="#60a5fa"/></svg>'),
+  chestplate: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><path d="M38 24h52l10 16-12 60H40L28 40z" fill="#60a5fa"/></svg>'),
+  boots: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="30" y="54" width="24" height="34" fill="#60a5fa"/><rect x="74" y="54" width="24" height="34" fill="#60a5fa"/></svg>'),
+  shield: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><path d="M64 20l30 12v26c0 20-14 38-30 46-16-8-30-26-30-46V32z" fill="#d4a24c"/></svg>'),
+  boat: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><path d="M22 72h84l-14 18H36z" fill="#8b5e34"/></svg>'),
+  stone: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="28" y="28" width="72" height="72" fill="#9ca3af"/></svg>'),
+  log: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="26" y="38" width="76" height="52" rx="8" fill="#8b5e34"/></svg>'),
+  horse: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="30" y="44" width="48" height="28" fill="#8b5e34"/><rect x="70" y="34" width="22" height="22" fill="#8b5e34"/></svg>'),
+  sheep: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="26" y="42" width="56" height="34" rx="10" fill="#ffffff"/><rect x="76" y="48" width="18" height="16" fill="#374151"/></svg>'),
+  pig: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="26" y="42" width="56" height="34" rx="8" fill="#f9a8d4"/><rect x="74" y="48" width="20" height="16" rx="4" fill="#f472b6"/></svg>'),
+  chicken: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><circle cx="58" cy="58" r="24" fill="#ffffff"/><polygon points="78,58 96,52 96,64" fill="#f59e0b"/></svg>'),
+  creeper: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="36" y="22" width="56" height="76" fill="#22c55e"/><rect x="46" y="40" width="8" height="8" fill="#111827"/><rect x="74" y="40" width="8" height="8" fill="#111827"/><rect x="56" y="54" width="16" height="12" fill="#111827"/><rect x="50" y="66" width="8" height="12" fill="#111827"/><rect x="70" y="66" width="8" height="12" fill="#111827"/></svg>'),
+  zombie: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="42" y="22" width="40" height="34" fill="#22c55e"/><rect x="38" y="58" width="48" height="30" fill="#38bdf8"/></svg>'),
+  skeleton: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><circle cx="64" cy="36" r="16" fill="#e5e7eb"/><rect x="58" y="52" width="12" height="30" fill="#e5e7eb"/></svg>'),
+  wolf: svgDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f8fafc"/><rect x="28" y="44" width="54" height="28" fill="#d1d5db"/><rect x="74" y="40" width="18" height="18" fill="#d1d5db"/></svg>')
+};
+
+function beep(freq=520,duration=.08){
+  try{
+    const AudioCtx=window.AudioContext||window.webkitAudioContext;
+    if(!window._ac) window._ac = new AudioCtx();
+    const ctx=window._ac, osc=ctx.createOscillator(), gain=ctx.createGain();
+    osc.type="square"; osc.frequency.value=freq; gain.gain.value=.03;
+    osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+duration);
+  }catch(e){}
+}
+
+function bestProgress(){
+  return state.activeStates.reduce((best,s)=>s.pos>best.pos?s:best, state.activeStates[0]||{option:currentWord().romaji[0],pos:0});
+}
+
+function handleType(char){
+  if(!state.started || state.timeLeft<=0) return;
+  const nextStates = [];
+  state.activeStates.forEach(s=>{ if(s.option[s.pos]===char) nextStates.push({option:s.option,pos:s.pos+1}); });
+  if(!nextStates.length){
+    state.missCount++; state.streak=0; state.score=Math.max(0,state.score-MISS_PENALTY); beep(220,.06); render(); return;
+  }
+  state.activeStates = nextStates;
+  state.totalTyped++;
+  state.streak++;
+  if(state.streak > state.maxStreak) state.maxStreak = state.streak;
+  state.score += POINT_PER_CHAR + Math.min(POINT_PER_STREAK * state.streak, 20);
+  beep(640,.05);
+  if(nextStates.some(s=>s.pos>=s.option.length)){
+    state.score += POINT_PER_WORD; state.correctWords++; beep(880,.12); state.index++; resetActive();
+  }
+  render();
+}
+
+document.addEventListener("keydown", (e)=>{
+  const key=(e.key||"").toLowerCase();
+  if(/^[a-z-]$/.test(key)){ e.preventDefault(); handleType(key); }
+  if((e.key==="Enter" || e.key===" ") && !state.started){ e.preventDefault(); startGame(); }
+});
+
+let timer = null;
+function startGame(){
+  state.started = true;
+  if(timer) clearInterval(timer);
+  timer = setInterval(()=>{
+    state.timeLeft--;
+    if(state.timeLeft<=0){ state.timeLeft=0; clearInterval(timer); timer=null; }
+    render();
+  },1000);
+  render();
+}
+function restart(){
+  if(timer) clearInterval(timer);
+  state.started=false; state.timeLeft=TOTAL_TIME; state.score=0; state.correctWords=0; state.totalTyped=0; state.missCount=0;
+  state.streak=0; state.maxStreak=0; state.wordPool=shuffle(WORDS); state.index=0; resetActive(); state.currentName=""; state.hasRegistered=false;
+  render();
+}
+async function loadSharedRankingNow(){
+  try{
+    state.rankingLoading=true; render();
+    const res = await fetch(APPS_SCRIPT_URL + "?mode=list");
+    const data = await res.json();
+    state.ranking = Array.isArray(data.items) ? data.items.slice(0,MAX_RANKING) : [];
+    saveLocalRanking(state.ranking);
+    state.rankingMessage = "共通ランキングを表示中";
+  }catch(e){
+    state.rankingMessage = "共通ランキングに つながらないため、この端末のランキングを表示しています。";
+  }finally{
+    state.rankingLoading=false; render();
+  }
+}
+async function registerScore(){
+  const name = (document.getElementById("nameInput")?.value || "").trim();
+  if(!name || state.hasRegistered || state.rankingLoading) return;
+  state.currentName = name;
+  try{
+    state.rankingLoading=true; render();
+    const res = await fetch(APPS_SCRIPT_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({name, score: state.score})});
+    const data = await res.json();
+    state.ranking = Array.isArray(data.items) ? data.items.slice(0,MAX_RANKING) : [];
+    saveLocalRanking(state.ranking);
+    state.rankingMessage = "共通ランキングに とうろくしたよ！";
+    state.hasRegistered = true;
+  }catch(e){
+    const next = [...state.ranking, {name, score: state.score}].sort((a,b)=>b.score-a.score).slice(0,MAX_RANKING);
+    state.ranking = next; saveLocalRanking(next); state.hasRegistered = true;
+    state.rankingMessage = "共通ランキングに つながらなかったため、この端末だけに とうろくしました。";
+  }finally{
+    state.rankingLoading=false; render();
+  }
+}
+
+function img(type, alt){ return `<img src="${IMAGES[type]}" alt="${alt}" style="width:100%;height:100%;object-fit:contain;image-rendering:pixelated">`; }
+
+function renderStart(){
+  return `<div class="center">
+    <div class="startgrid">
+      <div class="start">
+        <div class="emoji">🎮</div>
+        <h1>スタート しよう！</h1>
+        <p>でてきた ことばを ローマじで うとう！<br>スペースキーでも スタート できるよ！</p>
+        <div class="notes">
+          <div class="goal">もくひょう：800てん！</div>
+          <div class="note2">ミスが すくないと どんどん てんすうが のびるよ！</div>
+          <div>・つぎに うつ もじは きいろで ひかるよ</div>
+          <div>・つ / し / ち は 「tu」「si」「ti」でも OK！</div>
+          <div>・したの キーボードを クリックしても あそべるよ</div>
+        </div>
+        <button class="btn startbtn" onclick="startGame()">スタート</button>
+        <div class="small">Enterキー / Spaceキー でも スタート</div>
+      </div>
+      <div class="side">
+        <div class="previewgrid">
+          <div class="previewbox">${img("diamond_sword","ダイヤのけん")}</div>
+          <div class="previewbox">${img("creeper","クリーパー")}</div>
+          <div class="previewbox">${img("apple","りんご")}</div>
+          <div class="previewbox">${img("pickaxe","つるはし")}</div>
+        </div>
+        <div class="sidecap">
+          <div class="big">マイクラの ことばが いっぱい！</div>
+          <div class="sm">けん・チェスト・クリーパー などを ローマじで うって あそぼう！</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPlay(){
+  const cur = currentWord();
+  const prog = bestProgress();
+  const typed = prog.option.slice(0, prog.pos);
+  const rest = prog.option.slice(prog.pos);
+  const expected = [...new Set(state.activeStates.map(s=>s.option[s.pos]).filter(Boolean))];
+  return `<div class="playcol">
+    <div class="playcard">
+      <div class="playgrid">
+        <div class="imgbox">${img(cur.image, cur.jp)}</div>
+        <div>
+          <div class="label2">この ことばを ローマじで うとう！</div>
+          <div class="jp">${cur.jp}</div>
+          <div class="typed"><span class="good">${typed}</span><span class="rest">${rest}</span></div>
+          <div class="example">れい： ${cur.romaji.join(" / ")}</div>
+        </div>
+      </div>
+    </div>
+    <div class="kbd">
+      <div class="kbdtxt">したの キーボードを クリックしても OK！</div>
+      <div class="keys">
+        ${KEY_ROWS.map(row=>`<div class="keyrow">${row.map(k=>`<button class="key ${expected.includes(k)?'next':''}" onclick="handleType('${k}')">${k==='-'?'ー':k}</button>`).join("")}</div>`).join("")}
+      </div>
+      <div class="nexttxt">つぎに うてる もじ： <span class="nextbadge">${(expected.map(c=>c==='-'?'ー':c).join(" / ") || "おわり")}</span></div>
+    </div>
+  </div>`;
+}
+
+function rankItemClass(i){ return i===0?'gold':i===1?'silver':i===2?'bronze':'normal'; }
+function renderResult(){
+  const goal = state.score >= 800;
+  let msg = "すごい！";
+  if(state.score < 350) msg = "よく がんばったね！";
+  else if(state.score < 600) msg = "とっても じょうず！";
+  else if(state.score < 800) msg = "もうすこしで もくひょう！";
+  else if(state.score < 1000) msg = "おめでとう！ もくひょう たっせい！";
+  else msg = "やったね！ すごい きろく！";
+
+  return `<div class="resultwrap">
+    <div class="result ${goal?'goal':''}">
+      <div class="msg">${msg}</div>
+      ${goal?'<div style="margin-top:12px;font-size:56px">🎉🏆✨</div><div style="margin-top:12px;background:#fef3c7;border-radius:24px;padding:12px;font-size:24px;font-weight:900;color:#d97706">800てん いじょう クリア！ おめでとう！</div>':''}
+      <div class="scorelab">スコア</div>
+      <div class="scorebig">${state.score}</div>
+      <div class="grid4">
+        <div class="info"><div class="l">できた ことば</div><div class="n">${state.correctWords}</div></div>
+        <div class="info"><div class="l">うてた もじ</div><div class="n">${state.totalTyped}</div></div>
+        <div class="info"><div class="l">ミス</div><div class="n" style="color:#f43f5e">${state.missCount}</div></div>
+        <div class="info"><div class="l">れんぞく</div><div class="n" style="color:#10b981">${state.maxStreak}</div></div>
+      </div>
+      ${goal?'<div style="margin-top:14px;font-size:20px;font-weight:800;color:#475569">ミスが すくなくて とっても じょうず！</div>':''}
+      <button class="btn startbtn" style="font-size:32px;padding:14px 32px" onclick="restart()">もう いっかい</button>
+    </div>
+
+    <div class="rank">
+      <h2>クラス ランキング</h2>
+      <div class="rankrow">
+        <input id="nameInput" class="namein" placeholder="なまえを いれてね" value="${state.currentName}">
+        <button class="btn regbtn" onclick="registerScore()" ${state.hasRegistered || state.rankingLoading ? 'disabled':''}>${state.hasRegistered ? 'とうろく したよ' : 'ランキングに とうろく'}</button>
+        <button class="btn loadbtn" onclick="loadSharedRankingNow()" ${state.rankingLoading ? 'disabled':''}>${state.rankingLoading ? 'よみこみ中…' : '共通ランキングを よみこむ'}</button>
+      </div>
+      <div class="rmsg">${state.rankingMessage}</div>
+      <div class="list">
+        ${state.rankingLoading ? '<div class="item"><div class="nm">ランキングを よみこみ中…</div></div>' :
+          (state.ranking.length ? state.ranking.map((item,i)=>`<div class="item"><div class="ranknum ${rankItemClass(i)}">${i+1}</div><div class="nm">${item.name}</div><div class="sc">${item.score}</div></div>`).join("") : '<div class="item"><div class="nm">まだ ランキングが ないよ</div></div>')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("timeNum").textContent = state.timeLeft;
+  document.getElementById("scoreNum").textContent = state.score;
+  document.getElementById("wordNum").textContent = state.correctWords;
+  document.getElementById("missNum").textContent = state.missCount;
+  document.getElementById("timeFill").style.width = ((state.timeLeft / TOTAL_TIME) * 100) + "%";
+  const main = document.getElementById("main");
+  if(!state.started) main.innerHTML = renderStart();
+  else if(state.timeLeft === 0) main.innerHTML = renderResult();
+  else main.innerHTML = renderPlay();
+}
+render();
+</script>
+</body>
+</html>
